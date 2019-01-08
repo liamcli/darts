@@ -13,12 +13,13 @@ INITRANGE = 0.04
 
 class DARTSCell(nn.Module):
 
-  def __init__(self, ninp, nhid, dropouth, dropoutx, genotype):
+  def __init__(self, ninp, nhid, dropouth, dropoutx, genotype, init_op='tanh'):
     super(DARTSCell, self).__init__()
     self.nhid = nhid
     self.dropouth = dropouth
     self.dropoutx = dropoutx
     self.genotype = genotype
+    self.init_op = init_op
 
     # genotype is None when doing arch search
     steps = len(self.genotype.recurrent) if self.genotype is not None else STEPS
@@ -51,7 +52,7 @@ class DARTSCell(nn.Module):
       xh_prev = torch.cat([x, h_prev], dim=-1)
     c0, h0 = torch.split(xh_prev.mm(self._W0), self.nhid, dim=-1)
     c0 = c0.sigmoid()
-    h0 = h0.tanh()
+    h0 = self._get_activation(self.init_op)(h0)
     s0 = h_prev + c0 * (h0-h_prev)
     return s0
 
@@ -93,7 +94,7 @@ class RNNModel(nn.Module):
 
     def __init__(self, ntoken, ninp, nhid, nhidlast, 
                  dropout=0.5, dropouth=0.5, dropoutx=0.5, dropouti=0.5, dropoute=0.1,
-                 cell_cls=DARTSCell, genotype=None):
+                 cell_cls=DARTSCell, genotype=None, init_op='tanh'):
         super(RNNModel, self).__init__()
         self.lockdrop = LockedDropout()
         self.encoder = nn.Embedding(ntoken, ninp)
@@ -101,7 +102,7 @@ class RNNModel(nn.Module):
         assert ninp == nhid == nhidlast
         if cell_cls == DARTSCell:
             assert genotype is not None
-            self.rnns = [cell_cls(ninp, nhid, dropouth, dropoutx, genotype)]
+            self.rnns = [cell_cls(ninp, nhid, dropouth, dropoutx, genotype, init_op)]
         else:
             assert genotype is None
             self.rnns = [cell_cls(ninp, nhid, dropouth, dropoutx)]
