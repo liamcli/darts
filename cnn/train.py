@@ -72,6 +72,8 @@ def main():
   model = model.cuda()
 
   logging.info("param size = %fMB", utils.count_parameters_in_MB(model))
+  total_params = sum(x.data.nelement() for x in model.parameters())
+  logging.info('Model total parameters: {}'.format(total_params))
 
   criterion = nn.CrossEntropyLoss()
   criterion = criterion.cuda()
@@ -166,5 +168,5 @@ def infer(valid_queue, model, criterion):
 
 
 if __name__ == '__main__':
-  main() 
+  main()
 
