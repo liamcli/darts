@@ -21,6 +21,8 @@ from utils import batchify, get_batch, repackage_hidden, create_exp_dir, save_ch
 parser = argparse.ArgumentParser(description='PyTorch PennTreeBank/WikiText2 Language Model')
 parser.add_argument('--data', type=str, default='../data/penn/',
                     help='location of the data corpus')
+parser.add_argument('--init_op', type=str, default='tanh',
+                    help='opt to use for first node of cell')
 parser.add_argument('--emsize', type=int, default=850,
                     help='size of word embeddings')
 parser.add_argument('--nhid', type=int, default=850,
@@ -121,7 +123,7 @@ else:
     genotype = eval("genotypes.%s" % args.arch)
     model = model.RNNModel(ntokens, args.emsize, args.nhid, args.nhidlast, 
                        args.dropout, args.dropouth, args.dropoutx, args.dropouti, args.dropoute, 
-                       cell_cls=model.DARTSCell, genotype=genotype)
+                       cell_cls=model.DARTSCell, genotype=genotype, init_op=args.init_op)
 
 if args.cuda:
     if args.single_gpu:
@@ -299,7 +301,7 @@ try:
                 logging.info('Saving Normal!')
                 stored_loss = val_loss
 
-            if 't0' not in optimizer.param_groups[0] and (len(best_val_loss)>args.nonmono and val_loss > min(best_val_loss[:-args.nonmono])):
+            if 't0' not in optimizer.param_groups[0] and (len(best_val_loss)>args.nonmono and math.exp(val_loss) < 78 and val_loss > min(best_val_loss[:-args.nonmono])):
                 logging.info('Switching!')
                 optimizer = torch.optim.ASGD(model.parameters(), lr=args.lr, t0=0, lambd=0., weight_decay=args.wdecay)
             best_val_loss.append(val_loss)
