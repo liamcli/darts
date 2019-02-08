@@ -3,6 +3,7 @@ import sys
 import time
 import glob
 import numpy as np
+import random
 import torch
 import utils
 import logging
@@ -59,10 +60,12 @@ def main():
     sys.exit(1)
 
   np.random.seed(args.seed)
+  random.seed(args.seed)
   torch.cuda.set_device(args.gpu)
-  cudnn.benchmark = True
+  cudnn.benchmark = False
   torch.manual_seed(args.seed)
   cudnn.enabled=True
+  cudnn.deterministic=True
   torch.cuda.manual_seed(args.seed)
   logging.info('gpu device = %d' % args.gpu)
   logging.info("args = %s", args)
@@ -89,10 +92,10 @@ def main():
   valid_data = dset.CIFAR10(root=args.data, train=False, download=True, transform=valid_transform)
 
   train_queue = torch.utils.data.DataLoader(
-      train_data, batch_size=args.batch_size, shuffle=True, pin_memory=True, num_workers=2)
+      train_data, batch_size=args.batch_size, shuffle=True, pin_memory=True, num_workers=0)
 
   valid_queue = torch.utils.data.DataLoader(
-      valid_data, batch_size=args.batch_size, shuffle=False, pin_memory=True, num_workers=2)
+      valid_data, batch_size=args.batch_size, shuffle=False, pin_memory=True, num_workers=0)
 
   scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, float(args.epochs))
 
