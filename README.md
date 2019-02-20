@@ -1,3 +1,7 @@
+This fork of DARTS is used for the paper "Random Search and Reproducibility for NAS."
+
+Our modifications add deterministic training for the CNN benchmark and also allow for training shared weights with discrete architectures.
+
 # Differentiable Architecture Search
 Code accompanying the paper
 > [DARTS: Differentiable Architecture Search](https://arxiv.org/abs/1806.09055)\
