@@ -5,6 +5,7 @@ import glob
 import numpy as np
 import torch
 import utils
+import random
 import logging
 import argparse
 import torch.nn as nn
@@ -62,11 +63,13 @@ def main():
     logging.info('no gpu device available')
     sys.exit(1)
 
+  random.seed(args.seed)
   np.random.seed(args.seed)
   torch.cuda.set_device(args.gpu)
-  cudnn.benchmark = True
+  cudnn.benchmark = False
   torch.manual_seed(args.seed)
   cudnn.enabled=True
+  cudnn.deterministic=True
   torch.cuda.manual_seed(args.seed)
   logging.info('gpu device = %d' % args.gpu)
   logging.info("args = %s", args)
@@ -93,12 +96,12 @@ def main():
   train_queue = torch.utils.data.DataLoader(
       train_data, batch_size=args.batch_size,
       sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[:split]),
-      pin_memory=True, num_workers=2)
+      pin_memory=True, num_workers=0)
 
   valid_queue = torch.utils.data.DataLoader(
       train_data, batch_size=args.batch_size,
       sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[split:num_train]),
-      pin_memory=True, num_workers=2)
+      pin_memory=True, num_workers=0)
 
   scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, float(args.epochs), eta_min=args.learning_rate_min)
@@ -191,5 +194,5 @@ def infer(valid_queue, model, criterion):
 
 
 if __name__ == '__main__':
-  main() 
+  main()
 
