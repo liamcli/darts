@@ -77,3 +77,5 @@ DARTS_V2 = Genotype(normal=[('sep_conv_3x3', 0), ('sep_conv_3x3', 1), ('sep_conv
 DARTS = DARTS_V2
 
 ASHA200 = Genotype(normal=[('skip_connect', 1), ('dil_conv_3x3', 0), ('sep_conv_3x3', 1), ('skip_connect', 0), ('none', 1), ('max_pool_3x3', 0), ('skip_connect', 1), ('dil_conv_3x3', 0)], normal_concat=[2, 3, 4, 5], reduce=[('max_pool_3x3', 1), ('avg_pool_3x3', 0), ('sep_conv_5x5', 1), ('skip_connect', 2), ('max_pool_3x3', 3), ('none', 1), ('skip_connect', 0), ('sep_conv_5x5', 4)], reduce_concat=[2, 3, 4, 5])
+
+
