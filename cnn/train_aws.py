@@ -60,7 +60,17 @@ def main():
     logging.info('no gpu device available')
     sys.exit(1)
 
-  utils.download_from_s3('cnn_genotypes.txt', 'randomnas', 'genotypes.py')
+  try:
+      utils.download_from_s3('cnn_genotypes.txt', 'randomnas', '/tmp/cnn_genotypes.txt')
+
+      with open('genotypes.py', 'a') as f:
+          with open('/tmp/cnn_genotypes.txt') as archs:
+              f.write('\n')
+              for line in archs:
+                  f.write(line)
+  except Exception as e:
+      print(e)
+
 
   np.random.seed(args.seed)
   random.seed(args.seed)
