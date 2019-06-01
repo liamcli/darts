@@ -60,6 +60,8 @@ def main():
     logging.info('no gpu device available')
     sys.exit(1)
 
+  download_from_s3('cnn_genotypes.txt', 'randomnas', 'genotypes.py')
+
   np.random.seed(args.seed)
   random.seed(args.seed)
   torch.cuda.set_device(args.gpu)
