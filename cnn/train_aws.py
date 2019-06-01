@@ -9,7 +9,6 @@ import utils
 import logging
 import argparse
 import torch.nn as nn
-import genotypes
 import torch.utils
 import torchvision.datasets as dset
 import torch.backends.cudnn as cudnn
@@ -70,6 +69,7 @@ def main():
                   f.write(line)
   except Exception as e:
       print(e)
+  import genotypes
 
 
   np.random.seed(args.seed)
