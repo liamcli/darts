@@ -203,7 +203,7 @@ def save(epochs, model, optimizer, save_to_remote=False, s3_bucket=None):
     torch.save(checkpoint, ckpt)
 
     if save_to_remote:
-        utils.upload_to_s3(ckpt, s3_bucket, _ckpt)
+        utils.upload_to_s3(ckpt, s3_bucket, ckpt)
         utils.upload_to_s3(log, s3_bucket, log)
 
 def load(model, optimizer, save_to_remote=False, s3_bucket=None):
