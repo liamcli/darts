@@ -60,7 +60,7 @@ def main():
     logging.info('no gpu device available')
     sys.exit(1)
 
-  download_from_s3('cnn_genotypes.txt', 'randomnas', 'genotypes.py')
+  utils.download_from_s3('cnn_genotypes.txt', 'randomnas', 'genotypes.py')
 
   np.random.seed(args.seed)
   random.seed(args.seed)
@@ -193,16 +193,16 @@ def save(epochs, model, optimizer, save_to_remote=False, s3_bucket=None):
     torch.save(checkpoint, ckpt)
 
     if save_to_remote:
-        upload_to_s3(ckpt, s3_bucket, _ckpt)
-        upload_to_s3(log, s3_bucket, log)
+        utils.upload_to_s3(ckpt, s3_bucket, _ckpt)
+        utils.upload_to_s3(log, s3_bucket, log)
 
 def load(model, optimizer, save_to_remote=False, s3_bucket=None):
     # Try to download log and ckpt from s3 first to see if a ckpt exists.
     ckpt = os.path.join(args.save, 'model.ckpt')
     log = os.path.join(args.save, 'log.txt')
     if save_to_remote:
-        download_from_s3(ckpt, s3_bucket, ckpt)
-        download_from_s3(log, s3_bucket, log)
+        utils.download_from_s3(ckpt, s3_bucket, ckpt)
+        utils.download_from_s3(log, s3_bucket, log)
 
     checkpoint = torch.load(ckpt)
     model_state = checkpoint['model']
