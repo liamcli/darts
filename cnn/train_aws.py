@@ -41,20 +41,24 @@ parser.add_argument('--grad_clip', type=float, default=5, help='gradient clippin
 parser.add_argument('--save_to_remote', action='store_true', default=False, help='whether to save to aws')
 args = parser.parse_args()
 
-args.save = 'eval-{}-SEED{}'.format(args.save, args.seed)
-utils.create_exp_dir(args.save)
-
-log_format = '%(asctime)s %(message)s'
-logging.basicConfig(stream=sys.stdout, level=logging.INFO,
-    format=log_format, datefmt='%m/%d %I:%M:%S %p')
-fh = logging.FileHandler(os.path.join(args.save, 'log.txt'))
-fh.setFormatter(logging.Formatter(log_format))
-logging.getLogger().addHandler(fh)
-
-CIFAR_CLASSES = 10
 
 
 def main():
+  args.save = 'eval-{}-SEED{}'.format(args.save, args.seed)
+  utils.create_exp_dir(args.save)
+  log = os.path.join(args.save, 'log.txt')
+  if args.save_to_remote:
+      utils.download_from_s3(log, s3_bucket, log)
+
+  log_format = '%(asctime)s %(message)s'
+  logging.basicConfig(stream=sys.stdout, level=logging.INFO,
+      format=log_format, datefmt='%m/%d %I:%M:%S %p')
+  fh = logging.FileHandler(os.path.join(args.save, 'log.txt'))
+  fh.setFormatter(logging.Formatter(log_format))
+  logging.getLogger().addHandler(fh)
+
+  CIFAR_CLASSES = 10
+
   if not torch.cuda.is_available():
     logging.info('no gpu device available')
     sys.exit(1)
@@ -209,10 +213,8 @@ def save(epochs, model, optimizer, save_to_remote=False, s3_bucket=None):
 def load(model, optimizer, save_to_remote=False, s3_bucket=None):
     # Try to download log and ckpt from s3 first to see if a ckpt exists.
     ckpt = os.path.join(args.save, 'model.ckpt')
-    log = os.path.join(args.save, 'log.txt')
     if save_to_remote:
         utils.download_from_s3(ckpt, s3_bucket, ckpt)
-        utils.download_from_s3(log, s3_bucket, log)
 
     checkpoint = torch.load(ckpt)
     model_state = checkpoint['model']
