@@ -48,7 +48,7 @@ def main():
   utils.create_exp_dir(args.save)
   log = os.path.join(args.save, 'log.txt')
   if args.save_to_remote:
-      utils.download_from_s3(log, s3_bucket, log)
+      utils.download_from_s3(log, 'randomnas', log)
 
   log_format = '%(asctime)s %(message)s'
   logging.basicConfig(stream=sys.stdout, level=logging.INFO,
